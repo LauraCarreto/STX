@@ -1,0 +1,44 @@
+FILE 1:
+stx_sambamba_fromFastq.py
+
+Adapted from 'stx_subtyping.py'
+
+Features:
+
+1. Inputs a pair of Fastq files located in a given directory. All outputs will be found in this directory.
+2. Uses Bowtie2 instead of BWA for read alignment to stx all references; creates directory 'Bowtie_out' where the sorted BAM file will be found.
+3. Uses pysam to obtain a pileup description of the bases calls for each position along all references.
+4. Summarises depth from the pysam pileup into two PDF files: A) boxplots of depth for all references, and B) how alignment depth changes along all references (red lines in these plots higlight the unique positions used for subtyping; the plots can be used for quality control and also to compare relative load of stx1 and stx2 genes in samples that have both types.
+5. Outputs an XML file with the subtyping results in directory 'stx_subtyping_bowtie'; Stx subtype unique positions are used for identification; Default parameters include a minimum depth of 10 reads with a 40% frequency at the unique positions for subtype calling.
+6.Outputs a summary file with the depth for base calls using Sambamba (SambambaOut.txt) into the 'Bowtie_out' directory. The file is used to derive: A)the average depth for alignments with Type1 subtypes (1a,1c,1d); B) the average depth for alignments with Type2 subtypes (2a, 2b, 2c, 2d, 2e, 2f, 2g); and C) the overall average depth from the alignments to all the references (STOUT).
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+FILE 2:
+stx_sambamba_fromSortedBam_results_to_txt.py
+
+Adapted from the above 'stx_sambamba_fromFastq.py'; same aligner and same usage as the above, but with different outputs.
+
+Features:
+
+1.Inputs sorted Bam files instead of Fastq files; The sorted BAM files should be in the directory 'Bowtie_out', which is created in the directory where the Fastq files are found.
+2. Outputs the PDF files with A) boxplots of depth for all references, and B) how alignment depth changes along all references (as the above).
+3. Iteratively changes the frequency of base calling at the unique positions that is required for subtype calling. The frequency values for iteration are currently set as 90%, 40%, 30%, 20%. 
+4. Outputs the subtyping results to a text file instead of to an XML file. The text file (tab delimited) has no headers, but the frequency values are processed from larger to smaller.
+5. Outputs A)the average depth for alignments with Type1 subtypes (1a,1c,1d); B) the average depth for alignments with Type2 subtypes (2a, 2b, 2c, 2d, 2e, 2f, 2g); and C) the overall average depth from the alignments to all the references (in this order), to a text file. The text file (tab delimited) has no headers, but the outputs are ordered from point A to point C.
+6. If multiple samples are run simultaneously, the results will be appended to the same file (results file or depth summary file, respectively).
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+File 3: 
+stx_sequence_fromSambambaFile.py
+
+Adapted from 'stx_sambamba_fromSortedBam_results_to_txt.py'; same aligner and same usage as the above, but with a different output.
+
+Features:
+
+1. Should only be used with samples where only one subtype was confirmed by subtyping.This script does not perform subtype analysis.
+2. Uses the SambambaOut.txt file from the directory 'Bowtie_out'(see above) to derive a sequence for a given stx subtype. The most frequent base found at a given position, in a minimum of 5 reads, is aded to the sequence. 
+4. Outputs to terminal (STDOUT) and to a Fasta file. The latter can be found in the 'Bowtie_out' directory.
+
+
